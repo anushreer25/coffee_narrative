@@ -18,7 +18,6 @@ d3.csv("coffee.csv", d => {
   data = data.filter(d => d.country && d.totalScore > 0);
   console.log("Cleaned data:", data);
   console.log("Number of valid rows:", data.length);
-
   drawScene1(data);
 });
 
@@ -81,12 +80,26 @@ function drawScene1(data) {
     .attr("height", d => height - y(d.avg))
     .attr("fill", d => d.country === topCountry.country ? "#c0392b" : "steelblue");
 
-  g.append("text")
-  .attr("x", x(topCountry.country) + x.bandwidth() / 2)
-  .attr("y", y(topCountry.avg) + 20)   // changed from -15 to +20
-  .attr("text-anchor", "middle")
-  .style("font-size", "13px")
-  .style("font-weight", "bold")
-  .style("fill", "white")              // white so it's readable against the red bar
-  .text(`Highest rated: ${topCountry.country}`);
+  // Annotation using d3-annotation
+  const annotations = [
+    {
+      note: {
+        title: "Highest rated",
+        label: topCountry.country,
+      },
+      x: x(topCountry.country) + x.bandwidth() / 2,
+      y: y(topCountry.avg),
+      dy: -60,
+      dx: 30,
+      color: "#c0392b"
+    }
+  ];
+
+  const makeAnnotations = d3.annotation()
+    .type(d3.annotationCalloutCircle)
+    .annotations(annotations);
+
+  g.append("g")
+    .attr("class", "annotation-group")
+    .call(makeAnnotations);
 }
