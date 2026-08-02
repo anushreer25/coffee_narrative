@@ -1,9 +1,9 @@
 console.log("D3 loaded:", d3);
 
 const COLORS = {
-  neutral: "#a97155",     // coffee tan for regular bars
-  highlight: "#c0392b",   // red for the point being called out
-  accent: "#6f4e37"       // dark brown for scene 3 bars
+  neutral: "#a97155",     //  regular bars
+  highlight: "#c0392b",   // red for highligt
+  accent: "#6f4e37"       // scene 3 bars
 };
 
 const COUNTRY_NAME_MAP = {
@@ -12,7 +12,7 @@ const COUNTRY_NAME_MAP = {
   "United States": "United States of America",
   "United States (Hawaii)": "United States of America",
   "United States (Puerto Rico)": "Puerto Rico"
-  // all other names already match exactly between dataset and world-atlas
+  // MATCH NAMES HERE
 };
 
 function toAtlasName(datasetName) {
@@ -67,7 +67,7 @@ function drawScene1(data) {
   const width = 800 - margin.left - margin.right;
   const height = 650 - margin.top - margin.bottom;
 
-  // Title
+  // 
   svg.append("text")
     .attr("x", width / 2 + margin.left)
     .attr("y", 25)
@@ -90,7 +90,6 @@ function drawScene1(data) {
   const g = svg.append("g")
     .attr("transform", `translate(${margin.left},${margin.top})`);
 
-  // Group and average
   const grouped = d3.rollup(
     data,
     v => ({ avg: d3.mean(v, d => d.totalScore), count: v.length }),
@@ -102,7 +101,7 @@ function drawScene1(data) {
       avg: stats.avg,
       count: stats.count
     }))
-    .filter(d => d.count >= 10)   // minimum sample size threshold
+    .filter(d => d.count >= 10)   // min sample size 10
     .sort((a, b) => b.avg - a.avg)
     .slice(0, 10);
 
@@ -152,7 +151,7 @@ function drawScene1(data) {
     .attr("height", d => height - y(d.avg))
     .attr("fill", d => d.country === topCountry.country ? COLORS.highlight : COLORS.neutral);
 
-  // Annotation using d3-annotation
+  // d3 annotation
   const annotations = [
     {
       note: {
@@ -218,7 +217,7 @@ function drawScene2(data) {
     species,
     avg: stats.avg,
     count: stats.count
-  })).filter(d => d.species); // drop any blank/undefined species
+  })).filter(d => d.species); // drop any blankspecies
 
   const x = d3.scaleBand()
     .domain(speciesStats.map(d => d.species))
@@ -260,7 +259,7 @@ function drawScene2(data) {
     .attr("height", d => height - y(d.avg))
     .attr("fill", d => d.species === "Robusta" ? COLORS.highlight : COLORS.neutral);
 
-  // Sample size labels under each bar's score
+  //
   g.selectAll(".countLabel")
     .data(speciesStats)
     .join("text")
@@ -271,7 +270,6 @@ function drawScene2(data) {
     .style("font-size", "13px")
     .text(d => `avg: ${d.avg.toFixed(2)}`);
 
-  // Annotation explaining the sample size imbalance
   const robusta = speciesStats.find(d => d.species === "Robusta");
   const annotations = [
     {
@@ -306,7 +304,6 @@ function drawScene3(data) {
   const width = 800 - margin.left - margin.right;
   const height = 650 - margin.top - margin.bottom;
 
-  // Get countries with enough samples (reuse the same threshold idea from Scene 1)
   const grouped = d3.rollup(data, v => v.length, d => d.country);
   const countries = Array.from(grouped, ([country, count]) => ({ country, count }))
     .filter(d => d.count >= 10)
@@ -314,7 +311,6 @@ function drawScene3(data) {
     .map(d => d.country)
     .sort();
 
-  // Build the dropdown (parameter control / trigger)
   const controls = d3.select("#controls");
   controls.html(""); // clear old dropdown if re-entering scene
   controls.append("label").text("Select a country: ").style("font-weight", "bold");
@@ -331,16 +327,7 @@ function drawScene3(data) {
     .attr("value", d => d)
     .text(d => d);
 
-  // Title (static part)
-  svg.append("text")
-    .attr("id", "sceneTitle")
-    .attr("x", width / 2 + margin.left)
-    .attr("y", 25)
-    .attr("text-anchor", "middle")
-    .style("font-size", "20px")
-    .style("font-weight", "bold")
-    .text(`Cupping Profile: ${countries[0]}`);
-
+  
   svg.append("text")
   .attr("id", "subtitle")
   .attr("x", width / 2 + margin.left)
@@ -373,64 +360,7 @@ function drawScene3(data) {
       .range([0, width])
       .padding(0.3);
 
-    const y = d3.scaleLinear()
-      .domain([0, 10])
-      .range([height, 0]);
-
-    g.append("g")
-      .attr("transform", `translate(0,${height})`)
-      .call(d3.axisBottom(x));
-
-    g.append("g").call(d3.axisLeft(y));
-
-    g.selectAll(".bar")
-      .data(attrAverages)
-      .join("rect")
-      .attr("class", "bar")
-      .attr("x", d => x(d.attribute))
-      .attr("y", d => y(d.value))
-      .attr("width", x.bandwidth())
-      .attr("height", d => height - y(d.value))
-      .attr("fill", COLORS.accent);
-
-    g.selectAll(".valueLabel")
-      .data(attrAverages)
-      .join("text")
-      .attr("class", "valueLabel")
-      .attr("x", d => x(d.attribute) + x.bandwidth() / 2)
-      .attr("y", d => y(d.value) - 8)
-      .attr("text-anchor", "middle")
-      .style("font-size", "12px")
-      .text(d => d.value.toFixed(2));
-
-    // Annotation: highlight the strongest attribute for this country
-    const strongest = attrAverages.reduce((a, b) => (b.value > a.value ? b : a));
-
-    const annotations = [
-      {
-        note: {
-          title: "Standout attribute",
-          label: `${strongest.attribute} (${strongest.value.toFixed(2)})`,
-        },
-        x: x(strongest.attribute) + x.bandwidth() / 2,
-        y: y(strongest.value),
-        dy: -50,
-        dx: 40,
-        color: COLORS.highlight
-      }
-    ];
-
-    const makeAnnotations = d3.annotation()
-      .type(d3.annotationCalloutCircle)
-      .annotations(annotations);
-
-    g.append("g")
-      .attr("class", "annotation-group")
-      .call(makeAnnotations);
-  }
-
-  renderCountryChart(countries[0]); // initial render
-}
+     
 */
 let worldData = null;
 
