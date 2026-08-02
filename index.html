@@ -4,7 +4,50 @@
   <meta charset="utf-8">
   <title>Coffee Quality Narrative</title>
   <script src="https://d3js.org/d3.v7.min.js"></script>
-<script src="https://cdn.jsdelivr.net/npm/d3-svg-annotation@2.5.1/d3-annotation.min.js"></script>
+  <script src="https://cdn.jsdelivr.net/npm/d3-svg-annotation@2.5.1/d3-annotation.min.js"></script>
+  <script src="https://cdn.jsdelivr.net/npm/topojson-client@3/dist/topojson-client.min.js"></script>
+  <style>
+    body {
+      font-family: 'Georgia', serif;
+      background-color: #faf6f0;
+      color: #2e2e2e;
+      display: flex;
+      flex-direction: column;
+      align-items: center;
+      padding-top: 20px;
+    }
+    #nav {
+      margin-bottom: 10px;
+    }
+    #nav button {
+      background-color: #6f4e37;
+      color: white;
+      border: none;
+      padding: 10px 18px;
+      margin: 0 6px;
+      border-radius: 6px;
+      font-size: 14px;
+      cursor: pointer;
+      transition: background-color 0.2s;
+    }
+    #nav button:hover {
+      background-color: #543a29;
+    }
+    #controls {
+      font-size: 14px;
+    }
+    #controls select {
+      padding: 5px 10px;
+      border-radius: 4px;
+      border: 1px solid #ccc;
+      font-size: 14px;
+    }
+    #subtitle {
+      font-size: 14px;
+      font-style: italic;
+      fill: #666;
+    }
+  </style>
 </head>
 <body>
   <div id="nav">
@@ -12,7 +55,12 @@
     <button onclick="showScene(2)">Arabica vs Robusta</button>
     <button onclick="showScene(3)">Explore by Country</button>
   </div>
+  <div id="controls" style="margin-top:10px;"></div>
   <svg id="chart" width="800" height="650"></svg>
+  <div id="scene3Container" style="display:none; flex-direction: row; gap: 30px; margin-top: 10px; align-items: flex-start;">
+    <svg id="map"></svg>
+    <div id="profilePanel" style="width: 250px; padding: 15px; background: white; border-radius: 8px; box-shadow: 0 1px 4px rgba(0,0,0,0.1);"></div>
+  </div>
   <script src="main.js"></script>
 </body>
 </html>
