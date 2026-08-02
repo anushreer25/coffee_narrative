@@ -23,6 +23,24 @@ d3.csv("coffee.csv", d => {
 });
 
 function drawScene1(data) {
+  const svg = d3.select("#chart");
+  const margin = { top: 40, right: 20, bottom: 100, left: 60 };
+  const width = 800 - margin.left - margin.right;
+  const height = 500 - margin.top - margin.bottom;
+
+  // Title
+  svg.append("text")
+    .attr("x", width / 2 + margin.left)
+    .attr("y", 25)
+    .attr("text-anchor", "middle")
+    .style("font-size", "20px")
+    .style("font-weight", "bold")
+    .text("Top 10 Coffee-Producing Countries by Average Quality Score");
+
+  const g = svg.append("g")
+    .attr("transform", `translate(${margin.left},${margin.top})`);
+
+  // Group and average
   const grouped = d3.rollup(
     data,
     v => d3.mean(v, d => d.totalScore),
@@ -32,16 +50,6 @@ function drawScene1(data) {
   const countryAverages = Array.from(grouped, ([country, avg]) => ({ country, avg }))
     .sort((a, b) => b.avg - a.avg)
     .slice(0, 10);
-
-  console.log("Top 10 countries by avg score:", countryAverages);
-
-  const svg = d3.select("#chart");
-  const margin = { top: 40, right: 20, bottom: 100, left: 60 };
-  const width = 800 - margin.left - margin.right;
-  const height = 500 - margin.top - margin.bottom;
-
-  const g = svg.append("g")
-    .attr("transform", `translate(${margin.left},${margin.top})`);
 
   const x = d3.scaleBand()
     .domain(countryAverages.map(d => d.country))
@@ -61,6 +69,8 @@ function drawScene1(data) {
 
   g.append("g").call(d3.axisLeft(y));
 
+  const topCountry = countryAverages[0];
+
   g.selectAll(".bar")
     .data(countryAverages)
     .join("rect")
@@ -69,5 +79,14 @@ function drawScene1(data) {
     .attr("y", d => y(d.avg))
     .attr("width", x.bandwidth())
     .attr("height", d => height - y(d.avg))
-    .attr("fill", "steelblue");
+    .attr("fill", d => d.country === topCountry.country ? "#c0392b" : "steelblue");
+
+  g.append("text")
+    .attr("x", x(topCountry.country) + x.bandwidth() / 2)
+    .attr("y", y(topCountry.avg) - 15)
+    .attr("text-anchor", "middle")
+    .style("font-size", "13px")
+    .style("font-weight", "bold")
+    .style("fill", "#c0392b")
+    .text(`Highest rated: ${topCountry.country}`);
 }
