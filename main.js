@@ -124,6 +124,22 @@ function drawScene1(data) {
 
   g.append("g").call(d3.axisLeft(y));
 
+  g.append("text")
+    .attr("transform", "rotate(-90)")
+    .attr("x", -height / 2)
+    .attr("y", -45)
+    .attr("text-anchor", "middle")
+    .style("font-size", "13px")
+    .text("Average Quality Score");
+
+  
+  g.append("text")
+    .attr("x", width / 2)
+    .attr("y", height + 95)
+    .attr("text-anchor", "middle")
+    .style("font-size", "13px")
+    .text("Country of Origin");
+
   const topCountry = countryAverages[0];
 
   g.selectAll(".bar")
@@ -158,6 +174,11 @@ function drawScene1(data) {
   g.append("g")
     .attr("class", "annotation-group")
     .call(makeAnnotations);
+
+
+  d3.select("#blurb")
+    .append("div")
+    .html("As a working professional pursuing a master's degree, coffee has become a daily necessity rather than just the casual drink it was in high school. Reflecting over the past decade, I realize my taste in coffee has slowly shifted. I now favor higher quality espresso from local coffee shops, and find it difficult to enjoy value coffee from chains such as Dunkin or Starbucks. This led to a curiosity about coffee quality, and how its geographical origin may affect its taste. This narrative visualization explores whether a coffee's geographic origin relates to its quality, and how much of that relationship holds up once the data is examined carefully.");
 }
 
 function drawScene2(data) {
@@ -213,6 +234,21 @@ function drawScene2(data) {
     .call(d3.axisBottom(x));
 
   g.append("g").call(d3.axisLeft(y));
+
+  g.append("text")
+    .attr("transform", "rotate(-90)")
+    .attr("x", -height / 2)
+    .attr("y", -45)
+    .attr("text-anchor", "middle")
+    .style("font-size", "13px")
+    .text("Average Quality Score");
+
+  g.append("text")
+    .attr("x", width / 2)
+    .attr("y", height + 40)
+    .attr("text-anchor", "middle")
+    .style("font-size", "13px")
+    .text("Coffee Species");
 
   g.selectAll(".bar")
     .data(speciesStats)
