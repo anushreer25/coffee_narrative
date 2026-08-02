@@ -261,7 +261,7 @@ function drawScene2(data) {
 
    d3.select("#blurb")
     .append("p")
-    .html("<strong>Arabica</strong> and <strong>Robusta</strong> are the two main species of coffee grown commercially. Arabica is generally grown at higher altitudes, has a smoother, more complex flavor, and dominates specialty coffee production and reviews. Robusta is hardier, easier to grow, and produces a stronger, more bitter flavor, often used in instant coffee and espresso blends — which may help explain why it's reviewed far less often in quality-focused datasets like this one.");
+    .html("<strong>Arabica</strong> and <strong>Robusta</strong> are the two main species of coffee grown commercially. Arabica is generally grown at higher altitudes, has a smoother, more complex flavor, and dominates specialty coffee production and reviews. Robusta is hardier, easier to grow, and produces a stronger, more bitter flavor, often used in instant coffee and espresso blends.");
 }
 /*
 function drawScene3(data) {
