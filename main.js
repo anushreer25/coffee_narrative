@@ -1,5 +1,7 @@
 console.log("D3 loaded:", d3);
 
+let allData = [];
+
 d3.csv("coffee.csv", d => {
   return {
     country: d["Country.of.Origin"],
@@ -15,20 +17,27 @@ d3.csv("coffee.csv", d => {
     altitude: d["Altitude"]
   };
 }).then(data => {
-  data = data.filter(d => d.country && d.totalScore > 0);
-  console.log("Cleaned data:", data);
-  console.log("Number of valid rows:", data.length);
-  drawScene1(data);
+  allData = data.filter(d => d.country && d.totalScore > 0);
+  console.log("Cleaned data:", allData);
+  console.log("Number of valid rows:", allData.length);
+  showScene(1); // start on scene 1
 });
+
+function showScene(sceneNumber) {
+  d3.select("#chart").html(""); // clear previous scene
+  if (sceneNumber === 1) drawScene1(allData);
+  if (sceneNumber === 2) drawScene2(allData);
+  if (sceneNumber === 3) drawScene3(allData);
+}
 
 function drawScene1(data) {
   const svg = d3.select("#chart");
-  const margin = { top: 90, right: 20, bottom: 100, left: 60 };  // increased top from 40 to 90
+  const margin = { top: 90, right: 20, bottom: 100, left: 60 };
   const width = 800 - margin.left - margin.right;
   const height = 500 - margin.top - margin.bottom;
 
   // Title
-   svg.append("text")
+  svg.append("text")
     .attr("x", width / 2 + margin.left)
     .attr("y", 25)
     .attr("text-anchor", "middle")
@@ -89,7 +98,7 @@ function drawScene1(data) {
       },
       x: x(topCountry.country) + x.bandwidth() / 2,
       y: y(topCountry.avg),
-      dy: -30,   // reduced from -60
+      dy: -30,
       dx: 40,
       color: "#c0392b"
     }
@@ -102,4 +111,20 @@ function drawScene1(data) {
   g.append("g")
     .attr("class", "annotation-group")
     .call(makeAnnotations);
+}
+
+function drawScene2(data) {
+  d3.select("#chart").append("text")
+    .attr("x", 400).attr("y", 250)
+    .attr("text-anchor", "middle")
+    .style("font-size", "18px")
+    .text("Scene 2 coming soon");
+}
+
+function drawScene3(data) {
+  d3.select("#chart").append("text")
+    .attr("x", 400).attr("y", 250)
+    .attr("text-anchor", "middle")
+    .style("font-size", "18px")
+    .text("Scene 3 coming soon");
 }
