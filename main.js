@@ -89,8 +89,8 @@ function drawScene1(data) {
       },
       x: x(topCountry.country) + x.bandwidth() / 2,
       y: y(topCountry.avg),
-      dy: -60,
-      dx: 30,
+      dy: -30,   // reduced from -60
+      dx: 40,
       color: "#c0392b"
     }
   ];
