@@ -82,11 +82,11 @@ function drawScene1(data) {
     .attr("fill", d => d.country === topCountry.country ? "#c0392b" : "steelblue");
 
   g.append("text")
-    .attr("x", x(topCountry.country) + x.bandwidth() / 2)
-    .attr("y", y(topCountry.avg) - 15)
-    .attr("text-anchor", "middle")
-    .style("font-size", "13px")
-    .style("font-weight", "bold")
-    .style("fill", "#c0392b")
-    .text(`Highest rated: ${topCountry.country}`);
+  .attr("x", x(topCountry.country) + x.bandwidth() / 2)
+  .attr("y", y(topCountry.avg) + 20)   // changed from -15 to +20
+  .attr("text-anchor", "middle")
+  .style("font-size", "13px")
+  .style("font-weight", "bold")
+  .style("fill", "white")              // white so it's readable against the red bar
+  .text(`Highest rated: ${topCountry.country}`);
 }
