@@ -56,11 +56,17 @@
     <button onclick="showScene(3)">Explore by Country</button>
   </div>
   <div id="controls" style="margin-top:10px;"></div>
-  <svg id="chart" width="800" height="650"></svg>
+
+  <div id="scene12Container" style="display:flex; flex-direction:row; gap:20px; align-items:flex-start;">
+    <div id="blurb" style="width:220px; font-size:14px; line-height:1.5; color:#444; padding-top:100px;"></div>
+    <svg id="chart" width="800" height="650"></svg>
+  </div>
+
   <div id="scene3Container" style="display:none; flex-direction: row; gap: 30px; margin-top: 10px; align-items: flex-start;">
     <svg id="map"></svg>
     <div id="profilePanel" style="width: 250px; padding: 15px; background: white; border-radius: 8px; box-shadow: 0 1px 4px rgba(0,0,0,0.1);"></div>
   </div>
+
   <script src="main.js"></script>
 </body>
 </html>

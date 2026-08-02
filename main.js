@@ -47,13 +47,15 @@ function showScene(sceneNumber) {
   d3.select("#controls").html("");
   d3.select("#map").html("");
   d3.select("#profilePanel").html("");
+  d3.select("#blurb").html("");
   d3.select("#scene3Container").style("display", "none");
+  d3.select("#scene12Container").style("display", "flex");
   d3.select("#chart").style("display", "block");
 
   if (sceneNumber === 1) drawScene1(allData);
   if (sceneNumber === 2) drawScene2(allData);
   if (sceneNumber === 3) {
-    d3.select("#chart").style("display", "none");
+    d3.select("#scene12Container").style("display", "none");
     d3.select("#scene3Container").style("display", "flex");
     drawScene3(allData);
   }
@@ -256,6 +258,10 @@ function drawScene2(data) {
   g.append("g")
     .attr("class", "annotation-group")
     .call(makeAnnotations);
+
+   d3.select("#blurb")
+    .append("p")
+    .html("<strong>Arabica</strong> and <strong>Robusta</strong> are the two main species of coffee grown commercially. Arabica is generally grown at higher altitudes, has a smoother, more complex flavor, and dominates specialty coffee production and reviews. Robusta is hardier, easier to grow, and produces a stronger, more bitter flavor, often used in instant coffee and espresso blends — which may help explain why it's reviewed far less often in quality-focused datasets like this one.");
 }
 /*
 function drawScene3(data) {
@@ -425,6 +431,9 @@ function drawScene3(data) {
     .domain(d3.extent(countryStats, d => d.avg))
     .range([COLORS.neutral, COLORS.highlight]);
 
+  let pathGenerator = null;
+  let countriesGeoFeatures = null;
+
   function renderProfile(country) {
     d3.select("#countrySelect").property("value", country);
     const countryData = data.filter(d => d.country === country);
@@ -440,40 +449,50 @@ function drawScene3(data) {
 
     const panel = d3.select("#profilePanel");
     panel.html("");
-
-    panel.append("h2")
-      .text(country)
-      .style("margin", "0 0 4px 0")
-      .style("font-family", "Georgia, serif");
-
+    panel.append("h2").text(country).style("margin", "0 0 4px 0").style("font-family", "Georgia, serif");
     panel.append("p")
-      .style("font-size", "13px")
-      .style("font-style", "italic")
-      .style("color", "#666")
-      .style("margin-top", "0")
+      .style("font-size", "13px").style("font-style", "italic").style("color", "#666").style("margin-top", "0")
       .text(`Avg score: ${stat.avg.toFixed(2)} (${stat.count} reviews)`);
 
-    const list = panel.append("ul")
-      .style("list-style", "none")
-      .style("padding", "0")
-      .style("margin", "10px 0");
-
+    const list = panel.append("ul").style("list-style", "none").style("padding", "0").style("margin", "10px 0");
     list.selectAll("li")
       .data(attrAverages)
       .join("li")
-      .style("padding", "6px 0")
-      .style("border-bottom", "1px solid #eee")
-      .style("font-size", "15px")
+      .style("padding", "6px 0").style("border-bottom", "1px solid #eee").style("font-size", "15px")
       .style("font-weight", d => d.attribute === strongest.attribute ? "bold" : "normal")
       .style("color", d => d.attribute === strongest.attribute ? COLORS.highlight : "#2e2e2e")
-      .html(d => `${d.attribute === strongest.attribute ? "★ " : ""}${d.attribute}
-        <span style="float:right">${d.value.toFixed(2)}</span>`);
+      .html(d => `${d.attribute === strongest.attribute ? "★ " : ""}${d.attribute}<span style="float:right">${d.value.toFixed(2)}</span>`);
 
     panel.append("p")
-      .style("font-size", "12px")
-      .style("color", COLORS.highlight)
-      .style("margin-top", "10px")
+      .style("font-size", "12px").style("color", COLORS.highlight).style("margin-top", "10px")
       .text(`Standout attribute: ${strongest.attribute}`);
+
+    drawMapAnnotation(country, stat);
+  }
+
+  function drawMapAnnotation(country, stat) {
+    mapSvg.select(".map-annotation-group").remove();
+    if (!pathGenerator || !countriesGeoFeatures) return;
+
+    const feature = countriesGeoFeatures.find(f => f.properties.name === toAtlasName(country));
+    if (!feature) return;
+
+    const centroid = pathGenerator.centroid(feature);
+
+    const annotations = [{
+      note: {
+        title: country,
+        label: `Avg: ${stat.avg.toFixed(2)}`
+      },
+      x: centroid[0],
+      y: centroid[1] + 40,
+      dy: -50,
+      dx: 30,
+      color: COLORS.highlight
+    }];
+
+    const makeAnnotations = d3.annotation().type(d3.annotationCalloutCircle).annotations(annotations);
+    mapSvg.append("g").attr("class", "map-annotation-group").call(makeAnnotations);
   }
 
   function highlightMapCountry(country) {
@@ -484,15 +503,16 @@ function drawScene3(data) {
 
   function drawMap(world) {
     const countriesGeo = topojson.feature(world, world.objects.countries);
+    countriesGeoFeatures = countriesGeo.features;
     const projection = d3.geoNaturalEarth1().fitSize([mapWidth, mapHeight - 40], countriesGeo);
-    const path = d3.geoPath().projection(projection);
+    pathGenerator = d3.geoPath().projection(projection);
 
-    const mapG = mapSvg.append("g").attr("transform", "translate(0,40)");
+    const mapG = mapSvg.append("g").attr("class", "mapG").attr("transform", "translate(0,40)");
 
     mapG.selectAll("path")
       .data(countriesGeo.features)
       .join("path")
-      .attr("d", path)
+      .attr("d", pathGenerator)
       .attr("class", "country")
       .attr("fill", d => {
         const match = countryStats.find(c => toAtlasName(c.country) === d.properties.name);
