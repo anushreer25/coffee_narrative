@@ -2,8 +2,6 @@
 
 An interactive, three-scene data story about coffee quality, built with D3.js. It uses professional cupping scores to ask which countries and which species of coffee rate highest, and how much we should trust those comparisons.
 
-**Live demo:** _add your GitHub Pages link here_
-
 ## The scenes
 
 1. **Overview.** Top 10 coffee-producing countries by average quality score. Only countries with 10 or more reviews are included, to avoid small-sample bias. Ethiopia comes out on top (average 85.5 across 44 reviews).
